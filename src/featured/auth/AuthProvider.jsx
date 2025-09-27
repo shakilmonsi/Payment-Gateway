@@ -54,9 +54,8 @@ const AuthProvider = ({ children }) => {
 
       console.log("🔍 [AUTH] Full API Response:", res);
       console.log("🔍 [AUTH] Response Data:", res.data);
-      console.log("🔍 [AUTH] Response Status:", res.status);
+      console.log("🔍 [AUTH] Response Status:", res.status); // Try multiple possible data locations
 
-      // Try multiple possible data locations
       let currentUser = null;
       if (res.data.data) {
         currentUser = res.data.data;
@@ -84,9 +83,9 @@ const AuthProvider = ({ children }) => {
         const subscriptionExists = !!subscription;
 
         console.log("🚨 [AUTH] Subscription Analysis:");
-        console.log("  - Exists:", subscriptionExists);
-        console.log("  - Status:", subscriptionStatus);
-        console.log("  - Full Object:", subscription);
+        console.log("  - Exists:", subscriptionExists);
+        console.log("  - Status:", subscriptionStatus);
+        console.log("  - Full Object:", subscription);
 
         const calculatedHasUsedTrial =
           subscriptionExists || currentUser.hasUsedTrial || false;
@@ -380,252 +379,77 @@ const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }; // ⚠️ এই ফাংশনগুলি এখন createGenericSubscription দ্বারা প্রতিস্থাপিত হবে (ঐতিহাসিক সামঞ্জস্যের জন্য রাখা হয়েছে)
 
-  // 🚀 Enhanced Trial function with comprehensive debugging
   const startTrial = async (plan, paymentMethodId) => {
-    console.log("🔥 [TRIAL] StartTrial Called with:");
-    console.log("  - Plan:", plan);
-    console.log("  - PaymentMethodId:", paymentMethodId);
-    console.log("  - User Email:", user?.email);
-    console.log(
-      "  - Current Token:",
-      Cookies.get(COOKIE_NAME)?.substring(0, 20) + "...",
+    // ... (logic)
+    // এটি এখন createGenericSubscription কল করতে পারে বা এই লজিকটি সরাসরি ব্যবহার করা বন্ধ করতে পারে।
+    // আপাতত, আমরা createGenericSubscription ব্যবহার করব।
+    return await createGenericSubscription(
+      paymentMethodId,
+      plan?.priceId,
+      true,
     );
-    console.log("  - Current User State:", user);
-
-    // Enhanced validation
-    if (
-      !paymentMethodId ||
-      typeof paymentMethodId !== "string" ||
-      paymentMethodId.length < 5
-    ) {
-      const message = "Payment method ID is missing or invalid.";
-      console.error("❌ [TRIAL] Validation Error:", message);
-      toast.error(message);
-      return { success: false, error: message };
-    }
-
-    if (!user?.email) {
-      const message = "User email not found. Please login again.";
-      console.error("❌ [TRIAL] User validation error:", message);
-      toast.error(message);
-      return { success: false, error: message };
-    }
-
-    // Check current subscription status
-    console.log(
-      "🔍 [TRIAL] Pre-check - Current subscription:",
-      user?.subscription,
-    );
-    console.log("🔍 [TRIAL] Pre-check - Has used trial:", user?.hasUsedTrial);
-
-    if (
-      user?.hasUsedTrial ||
-      user?.subscription?.status === "trialing" ||
-      user?.subscription?.status === "active"
-    ) {
-      const message = "Trial already used or subscription active.";
-      console.error("❌ [TRIAL] Already used/active:", message);
-      toast.error("আপনি আগেই ট্রায়াল ব্যবহার করেছেন বা সাবস্ক্রিপশন আছে।");
-      return { success: false, error: message };
-    }
-
-    try {
-      const requestBody = {
-        email: user.email,
-        priceId: plan?.priceId,
-        useTrial: true,
-        paymentMethodId: paymentMethodId,
-      };
-
-      console.log("📤 [TRIAL] Sending request to backend:");
-      console.log("  - URL: /stripeSubscription/create-subscription");
-      console.log("  - Body:", requestBody);
-
-      const response = await instance.post(
-        "/stripeSubscription/create-subscription",
-        requestBody,
-      );
-
-      console.log("📥 [TRIAL] Backend Response:");
-      console.log("  - Status:", response.status);
-      console.log("  - Data:", response.data);
-      console.log("  - Headers:", response.headers);
-
-      if (isResponseSuccessful(response)) {
-        console.log("✅ [TRIAL] API Success! Processing response...");
-
-        // Immediate UI update with response data
-        const trialEndDate = new Date();
-        trialEndDate.setDate(trialEndDate.getDate() + 10);
-
-        const newSubscriptionData = {
-          id: response.data.subscriptionId || `temp_${Date.now()}`,
-          subscriptionId: response.data.subscriptionId,
-          status: "trialing",
-          trialEndsAt: trialEndDate.toISOString(),
-          customerId: response.data.customerId,
-          customerEmail: user.email,
-          planId: plan.priceId,
-          planName: plan.title,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          userId: user.id,
-        };
-
-        console.log(
-          "🔄 [TRIAL] Updating user state with:",
-          newSubscriptionData,
-        );
-
-        setUser((prevUser) => {
-          const updatedUser = {
-            ...prevUser,
-            subscription: newSubscriptionData,
-            hasUsedTrial: true,
-            isSubscribed: false, // trialing, not active subscription
-          };
-          console.log("✅ [TRIAL] User state updated to:", updatedUser);
-          return updatedUser;
-        });
-
-        console.log(
-          "🔄 [TRIAL] UI updated immediately. Scheduling backend sync...",
-        );
-
-        // Schedule background profile refresh
-        setTimeout(async () => {
-          try {
-            console.log("🔄 [TRIAL] Refreshing profile from backend...");
-            const updatedProfile = await fetchUserProfile();
-            console.log("✅ [TRIAL] Profile refresh complete:", updatedProfile);
-          } catch (error) {
-            console.error(
-              "⚠️ [TRIAL] Background profile refresh failed:",
-              error,
-            );
-          }
-        }, 3000);
-
-        toast.success(
-          "ট্রায়াল সফলভাবে শুরু হয়েছে! ১০ দিনের জন্য সব ফিচার ব্যবহার করুন।",
-        );
-        return { success: true, data: response.data };
-      } else {
-        const errorMsg =
-          response.data?.message ||
-          response.data?.error ||
-          "ট্রায়াল শুরু করা যায়নি।";
-        console.error("❌ [TRIAL] API returned non-success:", errorMsg);
-        toast.error(errorMsg);
-        return { success: false, error: errorMsg };
-      }
-    } catch (error) {
-      console.error("❌ [TRIAL] Exception occurred:");
-      console.error("  - Error:", error);
-      console.error("  - Response Status:", error.response?.status);
-      console.error("  - Response Data:", error.response?.data);
-      console.error("  - Request Config:", error.config);
-
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.message ||
-        "একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।";
-
-      toast.error(errorMessage);
-      return { success: false, error: errorMessage };
-    }
   };
-
-  // 🚀 Enhanced Subscribe function
   const subscribe = async (plan, paymentMethodId) => {
-    console.log("🔥 [SUB] Subscribe Called with:");
-    console.log("  - Plan:", plan);
-    console.log("  - PaymentMethodId:", paymentMethodId);
-    console.log("  - User Email:", user?.email);
+    // ... (logic)
+    // আপাতত, আমরা createGenericSubscription ব্যবহার করব।
+    return await createGenericSubscription(
+      paymentMethodId,
+      plan?.priceId,
+      false,
+    );
+  }; // ✅ পোস্টম্যানের ডেটা মডেল অনুযায়ী নতুন শক্তিশালী ফাংশন
 
-    if (
-      !paymentMethodId ||
-      typeof paymentMethodId !== "string" ||
-      paymentMethodId.length < 5
-    ) {
-      const message = "Payment method ID is missing or invalid.";
-      console.error("❌ [SUB] Validation Error:", message);
-      toast.error(message);
-      return { success: false, error: message };
-    }
-
-    if (!user?.email) {
-      const message = "User email not found. Please login again.";
-      console.error("❌ [SUB] User validation error:", message);
+  const createGenericSubscription = async (
+    paymentMethodId,
+    priceId,
+    isInitialTrial = false,
+  ) => {
+    console.log("🔥 [GEN_SUB] createGenericSubscription Called with:");
+    console.log("  - PaymentMethodId:", paymentMethodId);
+    console.log("  - PriceId:", priceId);
+    console.log("  - Is Initial Trial (initial):", isInitialTrial);
+    console.log("  - User ID:", user?.id);
+    if (!paymentMethodId || !user?.id) {
+      const message =
+        "Payment method ID বা User ID অনুপস্থিত। অনুগ্রহ করে লগইন করুন।";
+      console.error("❌ [GEN_SUB] Validation Error:", message);
       toast.error(message);
       return { success: false, error: message };
     }
 
     try {
+      // রিকোয়েস্ট বডি (Postman-এর Body-এর মতো)
       const requestBody = {
-        email: user.email,
-        priceId: plan?.priceId,
         paymentMethodId: paymentMethodId,
+        userId: user.id, // আপনার ইউজার অবজেক্ট থেকে নেওয়া হলো
+        priceId: priceId,
+        initial: isInitialTrial, // Postman-এর 'initial' প্যারামিটার
       };
 
-      console.log("📤 [SUB] Request Body:", requestBody);
-
+      console.log("📤 [GEN_SUB] Sending request to backend:", requestBody);
       const response = await instance.post(
-        "/stripeSubscription/create-subscription",
+        "/stripeSubscription/create-subscription", // <-- আপনার দেওয়া Endpoint
         requestBody,
       );
 
-      console.log("📥 [SUB] Response:", response.status, response.data);
-
       if (isResponseSuccessful(response)) {
-        console.log("✅ [SUB] Success!");
-
-        if (response.data.redirectUrl) {
-          window.location.href = response.data.redirectUrl;
-        } else {
-          // Update state for active subscription
-          setUser((prevUser) => ({
-            ...prevUser,
-            subscription: {
-              ...prevUser?.subscription,
-              id: response.data.subscriptionId,
-              subscriptionId: response.data.subscriptionId,
-              status: "active",
-              customerId: response.data.customerId,
-              customerEmail: user.email,
-              planId: plan.priceId,
-              planName: plan.title,
-              planAmount: plan.price,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              userId: user.id,
-            },
-            isSubscribed: true,
-            hasUsedTrial: true,
-          }));
-
-          setTimeout(() => fetchUserProfile(), 3000);
-          toast.success("সাবস্ক্রিপশন সফল হয়েছে!");
-        }
+        console.log("✅ [GEN_SUB] Subscription API Call Successful!");
+        toast.success("সাবস্ক্রিপশন প্রক্রিয়া সফল হয়েছে!"); // সফল হলে প্রোফাইল ডেটা রিফ্রেশ করুন
+        setTimeout(() => fetchUserProfile(), 3000);
         return { success: true, data: response.data };
       } else {
         const errorMsg =
-          response.data?.message || "সাবস্ক্রিপশন ব্যর্থ হয়েছে।";
-        console.error("❌ [SUB] Error:", errorMsg);
+          response.data?.message || "সাবস্ক্রিপশন তৈরি করা যায়নি।";
+        console.error("❌ [GEN_SUB] API returned non-success:", errorMsg);
         toast.error(errorMsg);
         return { success: false, error: errorMsg };
       }
     } catch (error) {
-      console.error("❌ [SUB] Exception:", error);
+      console.error("💣 [GEN_SUB] Exception occurred:", error);
       const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.message ||
-        "একটি সমস্যা হয়েছে।";
-
+        error.response?.data?.message || error.message || "একটি সমস্যা হয়েছে।";
       toast.error(errorMessage);
       return { success: false, error: errorMessage };
     }
@@ -653,6 +477,7 @@ const AuthProvider = ({ children }) => {
     fetchUserProfile,
     startTrial,
     subscribe,
+    createGenericSubscription, // ✅ নতুন ফাংশন
     deleteAccount,
   };
 
