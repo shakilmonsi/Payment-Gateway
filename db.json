@@ -1,0 +1,146 @@
+// {
+//   "users": [
+//     {
+//       "id": "8c2a",
+//       "name": "Md. Shakil Mia",
+//       "email": "sqwffrer@gmail.com",
+//       "password": "sqwffrer@gmail.com",
+//       "phoneNumber": "sqwffrer@gmail.com",
+//       "companyName": "sqwffrer@gmail.com",
+//       "profileImage": null,
+//       "isSubscribed": true,
+//       "planType": "trial",
+//       "hasUsedTrial": true,
+//       "subscriptionEndDate": "2025-09-10T12:16:13.209Z"
+//     },
+//     {
+//       "id": "1",
+//       "name": "Alice Johnson",
+//       "email": "alice.j@example.com",
+//       "status": "Active"
+//     },
+//     {
+//       "id": "2",
+//       "name": "Bob Smith",
+//       "email": "bob.s@example.com",
+//       "status": "Active"
+//     },
+//     {
+//       "id": "3",
+//       "name": "Carol Davis",
+//       "email": "carol.d@example.com",
+//       "status": "Active"
+//     },
+//     {
+//       "id": "204a",
+//       "name": "24hakil Mia",
+//       "email": "sqwff2345rer@gmail.com",
+//       "password": "sqwff2345rer@gmail.com",
+//       "phoneNumber": "01319559275",
+//       "companyName": "sqwff2345rer@gmail.com",
+//       "profileImage": null
+//     },
+//     {
+//       "id": "81ac",
+//       "name": "Md. Shakil Mia",
+//       "email": "sq342wff2345rer@gmail.com",
+//       "password": "global75.store",
+//       "phoneNumber": "01319559275",
+//       "companyName": "global75.store",
+//       "profileImage": null
+//     },
+//     {
+//       "id": "4b1b",
+//       "name": "user",
+//       "email": "user@gmail.com",
+//       "password": "user@gmail.com",
+//       "phoneNumber": "01319559275",
+//       "companyName": "global75.store",
+//       "profileImage": null
+//     }
+//   ],
+//   "activity": [
+//     {
+//       "id": "1",
+//       "description": "New user registration by Alice Johnson",
+//       "timestamp": "2 minutes ago"
+//     },
+//     {
+//       "id": "2",
+//       "description": "Document uploaded by Bob Smith",
+//       "timestamp": "15 minutes ago"
+//     },
+//     {
+//       "id": "3",
+//       "description": "Link verified by David Wilson",
+//       "timestamp": "2 hours ago"
+//     },
+//     {
+//       "id": "4",
+//       "description": "Settings updated by Carol Davis",
+//       "timestamp": "1 hour ago"
+//     }
+//   ],
+//   "records": [],
+//   "documents": [],
+//   "testimonials": [
+//     {
+//       "id": 1,
+//       "quote": "VehicleCheck Pro has transformed our daily operations. The digital forms save us hours each week, and the document reminders ensure we never miss renewals.",
+//       "author": "Sarah Mitchell",
+//       "title": "Fleet Manager, City Transport",
+//       "avatarUrl": "/image/home/Ellipse 1 (1).png",
+//       "stars": 5
+//     },
+//     {
+//       "id": 2,
+//       "quote": "As a professional driver, this app gives me peace of mind. The inspection process is thorough yet quick, and I love having all my documents in one secure place.",
+//       "author": "Michael Johnson",
+//       "title": "Professional Driver",
+//       "avatarUrl": "/image/home/Ellipse 1 (2).png",
+//       "stars": 5
+//     },
+//     {
+//       "id": 3,
+//       "quote": "The compliance features are excellent. We can easily generate reports for audits, and the automatic reminders help us stay on top of all regulations.",
+//       "author": "Lisa Rodriguez",
+//       "title": "Compliance Officer",
+//       "avatarUrl": "/image/home/Ellipse 1.png",
+//       "stars": 5
+//     }
+//   ],
+//   "pricing": [
+//     {
+//       "id": 1,
+//       "title": "Monthly Subscription",
+//       "price": "£5/monthly",
+//       "period": "Per Month",
+//       "trial": "10-Day FREE Trial",
+//       "trialNote": "No payment required",
+//       "features": [
+//         "Daily vehicle checks",
+//         "Full history & export",
+//         "Expiry date reminders",
+//         "Useful Link",
+//         "Cancel anytime."
+//       ],
+//       "isAnnual": false
+//     },
+//     {
+//       "id": 2,
+//       "title": "Annual Subscription",
+//       "price": "£99/year",
+//       "period": "Annual",
+//       "trial": "10-Day FREE Trial",
+//       "trialNote": "No payment required",
+//       "features": [
+//         "Daily vehicle checks",
+//         "Full history & export",
+//         "Expiry date reminders",
+//         "Useful Link",
+//         "Cancel anytime."
+//       ],
+//       "isAnnual": true
+//     }
+//   ]
+// }
